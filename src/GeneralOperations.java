@@ -1,2 +1,5 @@
-package PACKAGE_NAME;public class GeneralOperations {
+public class GeneralOperations {
+    public static void performGeneralOperations {
+
+    }
 }
