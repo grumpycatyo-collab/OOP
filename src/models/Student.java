@@ -1,9 +1,11 @@
+package models;
+
 import java.util.Date;
 
 public class Student {
-    String firstName;
-    String lastName;
-    String email;
+    public String firstName;
+    public String lastName;
+    public String email;
     Date enrollmentDate;
     Date dateOfBirth;
 
