@@ -1,16 +1,19 @@
 package operations;
 
+import file.FileManager;
 import models.Faculty;
 import models.Student;
 import models.StudyField;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GeneralOperations {
 
-    public static void createFaculty(List<Faculty> faculties, String name, String abbreviation, StudyField studyField) {
+    public static void createFaculty(ArrayList<Faculty> faculties, String name, String abbreviation, StudyField studyField) {
         Faculty faculty = new Faculty(name, abbreviation, studyField);
         faculties.add(faculty);
+        FileManager.saveData(faculties);
         System.out.println("models.Faculty created successfully.");
     }
 

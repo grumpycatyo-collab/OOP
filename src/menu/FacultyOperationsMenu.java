@@ -5,6 +5,7 @@ import models.Student;
 import operations.FacultyOperations;
 import operations.MenuOperations;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -12,7 +13,7 @@ import java.util.Scanner;
 import static operations.FacultyOperations.checkStudentBelongs;
 
 public class FacultyOperationsMenu {
-    public static void doFacultyOperationsMenu(Scanner scanner, List<Faculty> faculties) {
+    public static void doFacultyOperationsMenu(Scanner scanner, ArrayList<Faculty> faculties) {
         String choice;
         String input;
         do {
@@ -36,7 +37,7 @@ public class FacultyOperationsMenu {
                     boolean facultyFound = false;
                     for (Faculty faculty : faculties) {
                         if (faculty.abbreviation.equals(abbreviation)) {
-                            FacultyOperations.createStudent(faculty, student);
+                            FacultyOperations.createStudent(faculty,faculties,student);
                             facultyFound = true;
                             break;
                         }

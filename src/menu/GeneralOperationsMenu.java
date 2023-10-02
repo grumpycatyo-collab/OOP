@@ -5,12 +5,13 @@ import models.StudyField;
 import operations.GeneralOperations;
 import operations.MenuOperations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class GeneralOperationsMenu {
 
-    public static void doGeneralOperationsMenu(Scanner scanner, List<Faculty> faculties) {
+    public static void doGeneralOperationsMenu(Scanner scanner, ArrayList<Faculty> faculties) {
         String choice;
         String input;
         do {

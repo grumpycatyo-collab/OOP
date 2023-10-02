@@ -1,3 +1,4 @@
+import file.FileManager;
 import models.Faculty;
 
 import java.text.ParseException;
@@ -7,8 +8,7 @@ import java.util.Scanner;
 
 
 public class Main {
-    private static final List<Faculty> faculties = new ArrayList<>();
-
+    private static final ArrayList<Faculty> faculties = FileManager.loadData();
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         char choice;

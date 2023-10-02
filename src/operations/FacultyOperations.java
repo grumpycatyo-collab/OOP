@@ -1,15 +1,18 @@
 package operations;
 
+import file.FileManager;
 import models.Faculty;
 import models.Student;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class FacultyOperations {
 
-    public static void createStudent(Faculty faculty, Student student) {
+    public static void createStudent(Faculty faculty, ArrayList<Faculty> faculties, Student student) {
         faculty.students.add(student);
+        FileManager.saveData(faculties);
         System.out.println("models.Student created and assigned successfully.");
     }
 
