@@ -7,18 +7,17 @@ public class Student {
     public String firstName;
     public String lastName;
     public String email;
-    Date enrollmentDate;
-    Date dateOfBirth;
+    LocalDate enrollmentDate;
+    LocalDate dateOfBirth;
+    public boolean Graduated;
 
-    public Student(String firstName, String lastName, String email, Date enrollmentDate, Date dateOfBirth) {
+    public Student(String firstName, String lastName, String email, LocalDate enrollmentDate, LocalDate dateOfBirth, boolean Graduated) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.enrollmentDate = enrollmentDate;
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public Student(String firstName, String lastName, String email, LocalDate enrollmentDate, LocalDate dateOfBirth, boolean graduated) {
+        this.Graduated = Graduated;
     }
 
 
@@ -46,21 +45,28 @@ public class Student {
         this.email = email;
     }
 
-    public Date getEnrollmentDate() {
+    public LocalDate getEnrollmentDate() {
         return enrollmentDate;
     }
 
-    public void setEnrollmentDate(Date enrollmentDate) {
+    public void setEnrollmentDate(LocalDate enrollmentDate) {
         this.enrollmentDate = enrollmentDate;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
-    
-    
+
+
+    public boolean isGraduated() {
+        return Graduated;
+    }
+
+    public void setGraduated(boolean Graduated) {
+        this.Graduated = Graduated;
+    }
 }

@@ -7,13 +7,15 @@ public class Faculty {
     public String name;
     public String abbreviation;
     public List<Student> students;
+    public StudyField studyField;
+
 
     public Faculty(String name, String abbreviation, StudyField studyField) {
         this.name = name;
         this.abbreviation = abbreviation;
         this.studyField = studyField;
         this.students = new ArrayList<>();
-        this.graduates = new ArrayList<>();
+
     }
 
     public Faculty(String facultyName, String facultyAbbreviation, ArrayList<Object> objects, StudyField studyField) {
@@ -52,16 +54,8 @@ public class Faculty {
         this.studyField = studyField;
     }
 
-    public List<Student> getGraduates() {
-        return graduates;
-    }
 
-    public void setGraduates(List<Student> graduates) {
-        this.graduates = graduates;
-    }
 
-    public StudyField studyField;
-    public List<Student> graduates;
 
 
 }

@@ -10,27 +10,38 @@ import java.util.List;
 
 public class FacultyOperations {
 
+    public static Student getStudentByEmail(ArrayList<Faculty> faculties, String email) {
+
+        for (Faculty faculty : faculties) {
+            for (Student student : faculty.getStudents()) {
+                if (student.getEmail().equals(email))
+                    return student;
+            }
+        }
+
+        return null;
+    }
+
     public static void createStudent(Faculty faculty, ArrayList<Faculty> faculties, Student student) {
         faculty.students.add(student);
         FileManager.saveData(faculties);
         System.out.println("models.Student created and assigned successfully.");
     }
 
-    public static void graduateStudent(List<Faculty> faculties, String email) {
-        for (Faculty faculty : faculties) {
-            Iterator<Student> iterator = faculty.students.iterator();
-            while (iterator.hasNext()) {
-                Student student = iterator.next();
-                if (student.email.equals(email)) {
-                    iterator.remove();
-                    faculty.graduates.add(student);
-                    System.out.println("Student graduated from " + faculty.name + " faculty.");
-                    return;
-                }
-            }
+    public static void graduateStudent(ArrayList<Faculty> faculties, String email) {
+        Student foundStudent = getStudentByEmail(faculties, email);
+        if (foundStudent == null) {
+            System.out.println("Student with email " + email + " is not present");
+            return;
         }
-        System.out.println("Student with email " + email + " not found.");
+
+        foundStudent.setGraduated(true);
+        FileManager.saveData(faculties);
+        System.out.println("Student " + foundStudent.getFirstName() + " " + foundStudent.getLastName() + " graduated.");
+        FileManager.saveData(faculties);
+
     }
+
     public static void displayEnrolledStudents(Faculty faculty) {
         if (faculty.students.isEmpty()) {
             System.out.println("No students enrolled in " + faculty.name + " faculty.");
@@ -43,11 +54,12 @@ public class FacultyOperations {
     }
 
     public static void displayGraduatedStudents(Faculty faculty) {
+        System.out.println("Graduated students in " + faculty.getName() + ":");
 
-        System.out.println("Graduated students in " + faculty.name + " faculty:");
-        for (Student student : faculty.graduates) {
-            System.out.println(student.firstName + " " + student.lastName);
-
+        for (Student student : faculty.getStudents()) {
+            if (student.isGraduated()) {
+                System.out.println(student.getFirstName() + " " + student.getLastName() + " - " + student.getEmail());
+            }
         }
     }
 

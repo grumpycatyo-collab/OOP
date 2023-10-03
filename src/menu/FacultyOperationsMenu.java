@@ -6,8 +6,7 @@ import operations.FacultyOperations;
 import operations.MenuOperations;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 import static operations.FacultyOperations.checkStudentBelongs;
@@ -30,10 +29,10 @@ public class FacultyOperationsMenu {
                     int day = Integer.parseInt(parts[5]);
                     int month = Integer.parseInt(parts[6]);
                     int year = Integer.parseInt(parts[7]);
-                    Date enrollmentDate = new Date(year, month, day);
-                    Date dateOfBirth = new Date(year, month, day);
-
-                    Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth);
+                    LocalDate enrollmentDate = LocalDate.of(year, month, day);
+                    LocalDate dateOfBirth = LocalDate.of(year, month, day);
+                    boolean graduated = false;
+                    Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth,graduated);
                     boolean facultyFound = false;
                     for (Faculty faculty : faculties) {
                         if (faculty.abbreviation.equals(abbreviation)) {

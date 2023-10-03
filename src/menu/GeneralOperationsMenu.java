@@ -33,6 +33,8 @@ public class GeneralOperationsMenu {
                         GeneralOperations.displayFacultiesByField(faculties, StudyField.valueOf(parts[1]));
                     }
                     break;
+                case "b":
+                    break;
                 case "q":
                     System.out.println("Goodbye!");
                     break;
