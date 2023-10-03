@@ -42,29 +42,25 @@ public class FileManager {
             Faculty currentFaculty = null;
 
             while ((line = reader.readLine()) != null) {
+
                 if (line.startsWith("Faculty: ")) {
                     String facultyInfo = line.substring("Faculty: ".length());
                     String[] facultyData = facultyInfo.split(" \\(");
                     String name = facultyData[0];
                     String abbreviation = facultyData[1].split("\\), Study Field: ")[0];
                     String studyField = facultyData[1].split("\\), Study Field: ")[1];
-
                     currentFaculty = new Faculty(name, abbreviation, StudyField.valueOf(studyField));
                     faculties.add(currentFaculty);
-
 
                 } else if (line.startsWith("Student: ")) {
                     String[] studentInfo = line.substring(9).split(" ");
                     String firstName = studentInfo[0];
                     String lastName = studentInfo[1];
-
                     String email = reader.readLine().substring(7);
                     LocalDate enrollmentDate = LocalDate.parse(reader.readLine().substring("Enrollment Date: ".length()));
                     LocalDate dateOfBirth = LocalDate.parse(reader.readLine().substring("Date of Birth: ".length()));
                     boolean graduated = reader.readLine().substring("Graduated: ".length()).equals("Yes");
-
-                    Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth,graduated);
-
+                    Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth, graduated);
                     if (currentFaculty != null) {
                         FacultyOperations.createStudent(currentFaculty, faculties, student);
                     }
@@ -72,7 +68,7 @@ public class FileManager {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error loading data: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         }
 
         return faculties;

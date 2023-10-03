@@ -3,10 +3,8 @@ package menu;
 import models.Faculty;
 import models.StudyField;
 import operations.GeneralOperations;
-import operations.MenuOperations;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class GeneralOperationsMenu {
@@ -15,7 +13,7 @@ public class GeneralOperationsMenu {
         String choice;
         String input;
         do {
-            input = MenuOperations.displayGeneralOperationsMenu(scanner);
+            input = DisplayMenu.displayGeneralOperationsMenu(scanner);
             String[] parts = input.split("/");
             choice = parts[0];
 

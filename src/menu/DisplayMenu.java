@@ -1,8 +1,8 @@
-package operations;
+package menu;
 
 import java.util.Scanner;
 
-public class MenuOperations {
+public class DisplayMenu {
 
     public static char displayMainMenu(Scanner scanner) {
         System.out.println("Welcome to TUM's student management system!");

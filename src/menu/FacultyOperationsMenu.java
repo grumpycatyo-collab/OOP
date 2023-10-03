@@ -3,7 +3,6 @@ package menu;
 import models.Faculty;
 import models.Student;
 import operations.FacultyOperations;
-import operations.MenuOperations;
 
 import java.util.ArrayList;
 import java.time.LocalDate;
@@ -16,7 +15,7 @@ public class FacultyOperationsMenu {
         String choice;
         String input;
         do {
-            input = MenuOperations.displayFacultyOperationsMenu(scanner);
+            input = DisplayMenu.displayFacultyOperationsMenu(scanner);
             String[] parts = input.split("/");
             choice = parts[0];
 
