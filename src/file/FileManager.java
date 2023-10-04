@@ -18,12 +18,12 @@ public class FileManager {
     public static void saveData(ArrayList<Faculty> faculties) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             for (Faculty faculty : faculties) {
-                writer.write(String.format("Faculty: %s (%s), Study Field: %s%n", faculty.getName(), faculty.getAbbreviation(), faculty.getStudyField()));
+                writer.write(String.format("faculty: %s (%s), field: %s%n", faculty.getName(), faculty.getAbbreviation(), faculty.getStudyField()));
                 List<Student> students = faculty.getStudents();
 
                 for (Student student : students) {
-                    String studentInfo = String.format("Student: %s %s%nEmail: %s%nEnrollment Date: %s%nDate of Birth: %s%nGraduated: %s%n%n",
-                            student.getFirstName(), student.getLastName(), student.getEmail(), student.getEnrollmentDate(), student.getDateOfBirth(), student.isGraduated() ? "Yes" : "No");
+                    String studentInfo = String.format("student: %s %s%nemail: %s%nenrollment date: %s%ndate of birth: %s%ngraduated: %s%n%n",
+                            student.getFirstName(), student.getLastName(), student.getEmail(), student.getEnrollmentDate(), student.getDateOfBirth(), student.isGraduated() ? "yes" : "no");
                     writer.write(studentInfo);
                 }
                 writer.newLine();
@@ -43,24 +43,24 @@ public class FileManager {
 
             while ((line = reader.readLine()) != null) {
 
-                if (line.startsWith("Faculty: ")) {
-                    String facultyInfo = line.substring("Faculty: ".length());
+                if (line.startsWith("faculty: ")) {
+                    String facultyInfo = line.substring("faculty: ".length());
                     String[] facultyData = facultyInfo.split(" \\(");
                     String name = facultyData[0];
-                    String abbreviation = facultyData[1].split("\\), Study Field: ")[0];
-                    String studyField = facultyData[1].split("\\), Study Field: ")[1];
+                    String abbreviation = facultyData[1].split("\\), field: ")[0];
+                    String studyField = facultyData[1].split("\\), field: ")[1];
                     currentFaculty = new Faculty(name, abbreviation, StudyField.valueOf(studyField));
                     faculties.add(currentFaculty);
 
-                } else if (line.startsWith("Student: ")) {
+                } else if (line.startsWith("student: ")) {
                     String[] studentInfo = line.substring(9).split(" ");
                     String firstName = studentInfo[0];
                     String lastName = studentInfo[1];
                     String email = reader.readLine().substring(7);
-                    LocalDate enrollmentDate = LocalDate.parse(reader.readLine().substring("Enrollment Date: ".length()));
-                    LocalDate dateOfBirth = LocalDate.parse(reader.readLine().substring("Date of Birth: ".length()));
+                    LocalDate enrollmentDate = LocalDate.parse(reader.readLine().substring("enrollment date: ".length()));
+                    LocalDate dateOfBirth = LocalDate.parse(reader.readLine().substring("date of birth: ".length()));
                     boolean graduated = false;
-                    graduated = reader.readLine().substring("Graduated: ".length()).equals("Yes");
+                    graduated = reader.readLine().substring("graduated: ".length()).equals("yes");
                     Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth, graduated);
                     if (currentFaculty != null) {
                         currentFaculty.students.add(student);

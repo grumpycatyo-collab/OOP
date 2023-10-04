@@ -81,7 +81,6 @@ public class FacultyOperations {
     public static Faculty findFacultyByAbbreviation(List<Faculty> faculties, String abbreviation) {
         for (Faculty faculty : faculties) {
             if (faculty.abbreviation.equals(abbreviation)) {
-                logger.logInfo("findFacultyByAbbreviation success");
                 return faculty;
             }
         }
