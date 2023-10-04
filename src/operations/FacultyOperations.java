@@ -49,10 +49,10 @@ public class FacultyOperations {
         if (faculty.students.isEmpty()) {
             logger.logError("No students enrolled in this faculty");
         } else {
-            logger.logInfo("displayEnrolledStudents operation success");
-            System.out.println("Enrolled students in " + faculty.name + " faculty:");
             for (Student student : faculty.students) {
-                System.out.println(student.firstName + " " + student.lastName);
+                if (!student.isGraduated()) {
+                    System.out.println(student.firstName + " " + student.lastName);
+                }
             }
         }
     }

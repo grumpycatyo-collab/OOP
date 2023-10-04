@@ -22,7 +22,7 @@ public class FileManager {
                 List<Student> students = faculty.getStudents();
 
                 for (Student student : students) {
-                    String studentInfo = String.format("Student: %s %s%nEmail: %s%nEnrollment Date: %s%nDate of Birth: %s%nGraduated: %s%n",
+                    String studentInfo = String.format("Student: %s %s%nEmail: %s%nEnrollment Date: %s%nDate of Birth: %s%nGraduated: %s%n%n",
                             student.getFirstName(), student.getLastName(), student.getEmail(), student.getEnrollmentDate(), student.getDateOfBirth(), student.isGraduated() ? "Yes" : "No");
                     writer.write(studentInfo);
                 }
@@ -63,7 +63,7 @@ public class FileManager {
                     graduated = reader.readLine().substring("Graduated: ".length()).equals("Yes");
                     Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth, graduated);
                     if (currentFaculty != null) {
-                        FacultyOperations.createStudent(currentFaculty, faculties, student);
+                        currentFaculty.students.add(student);
                     }
                     reader.readLine();
                 }
