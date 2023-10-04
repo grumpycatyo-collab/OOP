@@ -59,7 +59,8 @@ public class FileManager {
                     String email = reader.readLine().substring(7);
                     LocalDate enrollmentDate = LocalDate.parse(reader.readLine().substring("Enrollment Date: ".length()));
                     LocalDate dateOfBirth = LocalDate.parse(reader.readLine().substring("Date of Birth: ".length()));
-                    boolean graduated = reader.readLine().substring("Graduated: ".length()).equals("Yes");
+                    boolean graduated = false;
+                    graduated = reader.readLine().substring("Graduated: ".length()).equals("Yes");
                     Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth, graduated);
                     if (currentFaculty != null) {
                         FacultyOperations.createStudent(currentFaculty, faculties, student);

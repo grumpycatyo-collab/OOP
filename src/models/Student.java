@@ -20,7 +20,6 @@ public class Student {
         this.Graduated = Graduated;
     }
 
-
     public String getFirstName() {
         return firstName;
     }
@@ -60,7 +59,6 @@ public class Student {
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
-
 
     public boolean isGraduated() {
         return Graduated;

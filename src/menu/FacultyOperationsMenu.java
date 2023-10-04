@@ -1,5 +1,6 @@
 package menu;
 
+import logger.DefaultLogger;
 import models.Faculty;
 import models.Student;
 import operations.FacultyOperations;
@@ -9,8 +10,10 @@ import java.time.LocalDate;
 import java.util.Scanner;
 
 import static operations.FacultyOperations.checkStudentBelongs;
+import static utils.Util.IsEmailValid;
 
 public class FacultyOperationsMenu {
+    private static final DefaultLogger logger = new DefaultLogger();
     public static void doFacultyOperationsMenu(Scanner scanner, ArrayList<Faculty> faculties) {
         String choice;
         String input;
@@ -30,6 +33,10 @@ public class FacultyOperationsMenu {
                     int year = Integer.parseInt(parts[7]);
                     LocalDate enrollmentDate = LocalDate.of(year, month, day);
                     LocalDate dateOfBirth = LocalDate.of(year, month, day);
+                    if (!IsEmailValid(email)){
+                        logger.logError("Email not valid");
+                        break;
+                    }
                     boolean graduated = false;
                     Student student = new Student(firstName, lastName, email, enrollmentDate, dateOfBirth,graduated);
                     boolean facultyFound = false;

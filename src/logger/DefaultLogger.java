@@ -8,27 +8,23 @@ public class DefaultLogger {
     private final static Logger ERROR_LOGGER = Logger.getLogger("ErrorLogger");
 
     static {
-        INFO_LOGGER.setLevel(Level.INFO);
-        ERROR_LOGGER.setLevel(Level.SEVERE);
+        configureLogger(INFO_LOGGER, Level.INFO, "info.log");
+        configureLogger(ERROR_LOGGER, Level.SEVERE, "error.log");
+    }
+
+    private static void configureLogger(Logger logger, Level level, String fileName) {
+        logger.setLevel(level);
 
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
+        logger.addHandler(consoleHandler);
 
-        FileHandler infoFileHandler;
-        FileHandler errorFileHandler;
-
+        FileHandler fileHandler;
         try {
-            infoFileHandler = new FileHandler("info.log");
-            errorFileHandler = new FileHandler("error.log");
-
-            infoFileHandler.setLevel(Level.INFO);
-            errorFileHandler.setLevel(Level.SEVERE);
-
-            infoFileHandler.setFormatter(new SimpleFormatter());
-            errorFileHandler.setFormatter(new SimpleFormatter());
-
-            INFO_LOGGER.addHandler(infoFileHandler);
-            ERROR_LOGGER.addHandler(errorFileHandler);
+            fileHandler = new FileHandler(fileName);
+            fileHandler.setLevel(level);
+            fileHandler.setFormatter(new SimpleFormatter());
+            logger.addHandler(fileHandler);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,5 +38,4 @@ public class DefaultLogger {
         ERROR_LOGGER.log(Level.SEVERE, message);
     }
 }
-
 
