@@ -14,7 +14,7 @@ public class CommandHandler {
     private static final String DIRECTORY_PATH = "pika";
     private LocalDateTime snapshotTime;
     private Map<String, FileData> fileDataMap = new HashMap<>();
-    private static WatchService watchService;
+    private static WatchService watchService;;
 
     private LocalDateTime SnapShotTime;
 
@@ -38,6 +38,7 @@ public class CommandHandler {
         }
     }
 
+
     public void handlePikaCommand(String command) {
         if (command.equals("commit")) {
             commit();
@@ -46,8 +47,8 @@ public class CommandHandler {
             info(filename);
         } else if (command.equals("status")) {
             status();
-        } else {
-            System.out.println("Unknown command");
+        } else if (command.equals("help")){
+           help();
         }
     }
 
@@ -55,16 +56,25 @@ public class CommandHandler {
         snapshotTime = LocalDateTime.now();
         setSnapShotTime(snapshotTime);
         fileDataMap.clear();
+
         try {
             Files.walk(Paths.get(DIRECTORY_PATH)).forEach(path -> {
                 if (Files.isRegularFile(path)) {
-                    fileDataMap.put(path.toString(), new FileData(path.toFile()));
+                    fileDataMap.put(path.toString(), new FileData(path.toFile(), "- commited"));
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
         System.out.println("Snapshot updated at " + snapshotTime);
+    }
+
+
+    private void help(){
+        System.out.println("Available commands:");
+        System.out.println("    commit - Creates a snapshot of the current state of files.");
+        System.out.println("    info <filename> - Provides information about a specific file.");
+        System.out.println("    status - Displays the current status of files and any recent changes.");
     }
 
     private void info(String filename) {
@@ -157,107 +167,49 @@ public class CommandHandler {
     }
 
     private void status() {
-        snapshotTime = getSnapShotTime();
-        System.out.println("Snapshot created at " + snapshotTime);
-        try {
-            WatchKey key = watchService.poll();
-            if (key != null) {
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    WatchEvent.Kind<?> kind = event.kind();
-                    if (kind == StandardWatchEventKinds.OVERFLOW) {
-                        System.out.println("Events lost, too many changes!");
-                        continue;
-                    }
+        if (snapshotTime != null) {
+            System.out.println("Snapshot created at " + snapshotTime);
+        }
+        if (fileDataMap.isEmpty()) {
+            System.out.println("No changes");
+        }
 
-                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                    Path fileName = ev.context();
-                    Path fullPath = Paths.get(DIRECTORY_PATH).resolve(fileName);
-
-                    String fileNameStr = fullPath.toString();
-                    if (fileNameStr.endsWith("~")) {
-                        continue;
-                    }
-                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                        System.out.println("File created: " + fullPath);
-                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile()));
-                    } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                        System.out.println("File deleted: " + fullPath);
-                        fileDataMap.remove(fileNameStr);
-                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        System.out.println("File modified: " + fullPath);
-                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile()));
-                    }
+        WatchKey key = watchService.poll();
+        if (key != null) {
+            for (WatchEvent<?> event : key.pollEvents()) {
+                WatchEvent.Kind<?> kind = event.kind();
+                if (kind == StandardWatchEventKinds.OVERFLOW) {
+                    System.out.println("Events lost, too many changes!");
+                    continue;
                 }
-                key.reset();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void status_log() {
-        snapshotTime = getSnapShotTime();
-        LOGGER.log(Level.INFO, "Snapshot created at: "+ snapshotTime);
-        try {
-            WatchKey key = watchService.poll();
-            if (key != null) {
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    WatchEvent.Kind<?> kind = event.kind();
-                    if (kind == StandardWatchEventKinds.OVERFLOW) {
-                        System.out.println("Events lost, too many changes!");
-                        continue;
-                    }
+                WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                Path fileName = ev.context();
+                Path fullPath = Paths.get(DIRECTORY_PATH).resolve(fileName);
 
-                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                    Path fileName = ev.context();
-                    Path fullPath = Paths.get(DIRECTORY_PATH).resolve(fileName);
-
-                    String fileNameStr = fullPath.toString();
-                    if (fileNameStr.endsWith("~")) {
-                        continue;
-                    }
-
-                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                        LOGGER.log(Level.INFO,"File created: " + fullPath);
-                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile()));
-                    } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                        LOGGER.log(Level.INFO,"File deleted: " + fullPath);
-                        fileDataMap.remove(fileNameStr);
-                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        LOGGER.log(Level.INFO,"File modified: " + fullPath);
-                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile()));
-                    }
+                String fileNameStr = fullPath.toString();
+                if (fileNameStr.endsWith("~")) {
+                    continue;
                 }
-                key.reset();
+                if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                    fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- created"));
+                } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                    fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- deleted"));
+                } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                    fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- modified"));
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            key.reset();
+        }
+        for (Map.Entry<String, FileData> entry : fileDataMap.entrySet()) {
+            String name = entry.getKey();
+            FileData data = entry.getValue();
+            long lastModified = data.getLastModified();
+            String modificationType = data.getModificationType();
+
+            System.out.println(name + " : " + lastModified + modificationType);
         }
     }
-    public void detectChanges() {
-        status_log();
-    }
 
-
-    public CommandHandler() {
-        try {
-            // Remove ConsoleHandler to prevent messages from being displayed in the console
-            LOGGER.setUseParentHandlers(false);
-
-            // Configure the logger to write to a file
-            FileHandler fileHandler = new FileHandler("application.log");
-            fileHandler.setLevel(Level.ALL);
-            LOGGER.addHandler(fileHandler);
-
-            // Set logger level to ALL to capture all messages
-            LOGGER.setLevel(Level.ALL);
-
-            // Schedule the change detector to run every 5 seconds
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            scheduler.scheduleAtFixedRate(new ChangeDetector(this), 0, 5, TimeUnit.SECONDS);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error setting up file handler", e);
-        }
-    }
 
 }
