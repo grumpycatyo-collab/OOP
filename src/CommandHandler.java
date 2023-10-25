@@ -3,30 +3,40 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.TimerTask;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class CommandHandler {
     private static final String DIRECTORY_PATH = "pika";
     private LocalDateTime snapshotTime;
     private Map<String, FileData> fileDataMap = new HashMap<>();
-    private static WatchService watchService;;
+    private static WatchService watchService;
+    ;
+    private String Message;
 
     private LocalDateTime SnapShotTime;
+
+    public String getMessage() {
+        return Message;
+    }
+
+    public void setMessage(String message) {
+        Message = message;
+    }
 
     public LocalDateTime getSnapShotTime() {
         return SnapShotTime;
     }
 
+
     public void setSnapShotTime(LocalDateTime snapShotTime) {
         SnapShotTime = snapShotTime;
     }
 
-    private static final Logger LOGGER = Logger.getLogger(CommandHandler.class.getName());
 
     static {
         try {
@@ -40,37 +50,56 @@ public class CommandHandler {
 
 
     public void handlePikaCommand(String command) {
+        handlePikaCommand(command, null, null);
+    }
+
+    public void handlePikaCommand(String command, String arg1) {
+        handlePikaCommand(command, arg1, null);
+    }
+
+    public void handlePikaCommand(String command, String arg1, String arg2) {
         if (command.equals("commit")) {
-            commit();
-        } else if (command.startsWith("info")) {
-            String filename = command.substring(5);
-            info(filename);
+            commit(arg1, arg2);
+        } else if (command.equals("info")) {
+            if (arg1 != null) {
+                info(arg1);
+            } else {
+                System.out.println("Missing filename argument for 'info' command.");
+            }
         } else if (command.equals("status")) {
             status();
-        } else if (command.equals("help")){
-           help();
+        } else if (command.equals("help")) {
+            help();
+        } else {
+            System.out.println("Unknown command");
         }
     }
 
-    private void commit() {
+    private void commit(String secondary, String message) {
+
         snapshotTime = LocalDateTime.now();
         setSnapShotTime(snapshotTime);
-        fileDataMap.clear();
+        if (Objects.equals(secondary, "-m")) {
+            setMessage(message);
+            System.out.println("Snapshot updated at " + snapshotTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " with message: " + message);
+            fileDataMap.clear();
 
-        try {
-            Files.walk(Paths.get(DIRECTORY_PATH)).forEach(path -> {
-                if (Files.isRegularFile(path)) {
-                    fileDataMap.put(path.toString(), new FileData(path.toFile(), "- commited"));
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                Files.walk(Paths.get(DIRECTORY_PATH)).forEach(path -> {
+                    if (Files.isRegularFile(path)) {
+                        fileDataMap.put(path.toString(), new FileData(path.toFile(), "- commited"));
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Message not found");
         }
-        System.out.println("Snapshot updated at " + snapshotTime);
+
     }
 
-
-    private void help(){
+    private void help() {
         System.out.println("Available commands:");
         System.out.println("    commit - Creates a snapshot of the current state of files.");
         System.out.println("    info <filename> - Provides information about a specific file.");
@@ -104,14 +133,14 @@ public class CommandHandler {
                         System.out.println("Image Size: " + getImageSize(fileData));
                     } else if (extension.equalsIgnoreCase("txt")) {
 
-                        System.out.println("Line Count: " + getLineCount(fileData));
-                        System.out.println("Word Count: " + getWordCount(fileData));
-                        System.out.println("Character Count: " + getCharacterCount(fileData));
+                        System.out.println("Line Count: " + FileData.getLineCount(fileData));
+                        System.out.println("Word Count: " + FileData.getWordCount(fileData));
+                        System.out.println("Character Count: " + FileData.getCharacterCount(fileData));
                     } else if (extension.equalsIgnoreCase("py") || extension.equalsIgnoreCase("java")) {
 
-                        System.out.println("Line Count: " + getLineCount(fileData));
-                        System.out.println("Class Count: " + getClassCount(fileData));
-                        System.out.println("Method Count: " + getMethodCount(fileData));
+                        System.out.println("Line Count: " + FileData.getLineCount(fileData));
+                        System.out.println("Class Count: " + FileData.getClassCount(fileData));
+                        System.out.println("Method Count: " + FileData.getMethodCount(fileData));
                     }
                 }
             } catch (IOException e) {
@@ -140,74 +169,66 @@ public class CommandHandler {
         return "Not an image file";
     }
 
-    private int getLineCount(Path file) throws IOException {
-        return Files.readAllLines(file).size();
-    }
 
-    private int getWordCount(Path file) throws IOException {
-        return Files.readAllLines(file).stream()
-                .mapToInt(line -> line.split("\\s+").length)
-                .sum();
-    }
 
-    private int getCharacterCount(Path file) throws IOException {
-        return (int) Files.lines(file).flatMapToInt(CharSequence::chars).count();
-    }
-
-    private int getClassCount(Path file) throws IOException {
-        return (int) Files.lines(file)
-                .filter(line -> line.matches("\\s*class\\s+\\w+\\s*\\{"))
-                .count();
-    }
-
-    private int getMethodCount(Path file) throws IOException {
-        return (int) Files.lines(file)
-                .filter(line -> line.matches("\\s*\\w+\\s+\\w+\\s*\\(.*\\)\\s*\\{"))
-                .count();
-    }
 
     private void status() {
-        if (snapshotTime != null) {
-            System.out.println("Snapshot created at " + snapshotTime);
-        }
-        if (fileDataMap.isEmpty()) {
-            System.out.println("No changes");
-        }
+        Logger logger = LoggerSetup.getLogger(CommandHandler.class.getName());
+        logger.setUseParentHandlers(false);
 
-        WatchKey key = watchService.poll();
-        if (key != null) {
-            for (WatchEvent<?> event : key.pollEvents()) {
-                WatchEvent.Kind<?> kind = event.kind();
-                if (kind == StandardWatchEventKinds.OVERFLOW) {
-                    System.out.println("Events lost, too many changes!");
-                    continue;
-                }
-
-                WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                Path fileName = ev.context();
-                Path fullPath = Paths.get(DIRECTORY_PATH).resolve(fileName);
-
-                String fileNameStr = fullPath.toString();
-                if (fileNameStr.endsWith("~")) {
-                    continue;
-                }
-                if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                    fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- created"));
-                } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                    fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- deleted"));
-                } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                    fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- modified"));
-                }
+        try {
+            if (snapshotTime != null && getMessage() != null) {
+                String snapshotMessage = "Snapshot created at " + snapshotTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " with message:" + getMessage();
+                System.out.println(snapshotMessage);
+                logger.info(snapshotMessage);
             }
-            key.reset();
-        }
-        for (Map.Entry<String, FileData> entry : fileDataMap.entrySet()) {
-            String name = entry.getKey();
-            FileData data = entry.getValue();
-            long lastModified = data.getLastModified();
-            String modificationType = data.getModificationType();
+            if (fileDataMap.isEmpty()) {
+                String noChangesMessage = "No changes";
+                System.out.println(noChangesMessage);
+                logger.info(noChangesMessage);
+            }
 
-            System.out.println(name + " : " + lastModified + modificationType);
+            WatchKey key = watchService.poll();
+            if (key != null) {
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    WatchEvent.Kind<?> kind = event.kind();
+                    if (kind == StandardWatchEventKinds.OVERFLOW) {
+                        String overflowMessage = "Events lost, too many changes!";
+                        System.out.println(overflowMessage);
+                        logger.info(overflowMessage);
+                        continue;
+                    }
+
+                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                    Path fileName = ev.context();
+                    Path fullPath = Paths.get(DIRECTORY_PATH).resolve(fileName);
+
+                    String fileNameStr = fullPath.toString();
+                    if (fileNameStr.endsWith("~")) {
+                        continue;
+                    }
+                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- created"));
+                    } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- deleted"));
+                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                        fileDataMap.put(fileNameStr, new FileData(fullPath.toFile(), "- modified"));
+                    }
+                }
+                key.reset();
+            }
+            for (Map.Entry<String, FileData> entry : fileDataMap.entrySet()) {
+                String name = entry.getKey();
+                FileData data = entry.getValue();
+                long lastModified = data.getLastModified();
+                String modificationType = data.getModificationType();
+
+                String logMessage = name + " : " + lastModified + modificationType;
+                System.out.println(logMessage);
+                logger.info(logMessage);
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "An error occurred in status() method", e);
         }
     }
 
