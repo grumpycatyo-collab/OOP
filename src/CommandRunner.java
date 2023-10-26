@@ -11,10 +11,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//TODO add exit button
-//TODO add inheritance and polymorphism
 
-public class CommandRunner {
+public class CommandRunner extends Thread{
     private static final String DIRECTORY_PATH = "pika";
     private static LocalDateTime snapshotTime;
     private static Map<String, FileData> fileDataMap = new HashMap<>();
@@ -54,10 +52,21 @@ public class CommandRunner {
     }
 
     public CommandRunner() {
-        // Schedule the detection flow every 5 seconds
-        scheduler.scheduleAtFixedRate(this::runDetection, 0, 5, TimeUnit.SECONDS);
+
     }
 
+    @Override
+    public void run() {
+        // Schedule the detection flow every 5 seconds
+        while (true) {
+            runDetection();
+            try {
+                Thread.sleep(5000); // Sleep for 5 seconds
+            } catch (InterruptedException e) {
+                e.printStackTrace(); // Handle the interruption if needed
+            }
+        }
+    }
     private void runDetection() {
         status_log();
     }
@@ -90,6 +99,7 @@ public class CommandRunner {
     }
 
     public static void help() {
+        System.out.println("NOTE: ./pika directory is the test directory where files are being monitored)");
         System.out.println("Available commands:");
         System.out.println("    commit - Creates a snapshot of the current state of files.");
         System.out.println("    info <filename> - Provides information about a specific file.");
