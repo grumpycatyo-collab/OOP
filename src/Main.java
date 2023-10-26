@@ -1,10 +1,10 @@
-import java.util.Objects;
 import java.util.Scanner;
 
 
 public class Main {
     public static void main(String[] args) {
         CommandHandler commandHandler = new CommandHandler();
+        CommandRunner commandRunner = new CommandRunner();
 
         Scanner scanner = new Scanner(System.in);
         while (true) {

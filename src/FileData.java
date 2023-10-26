@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 public class FileData {
     private String name;
@@ -56,14 +57,19 @@ public class FileData {
     }
 
     public static int getClassCount(Path file) throws IOException {
-        return (int) Files.lines(file)
-                .filter(line -> line.matches("\\s*class\\s+\\w+\\s*\\{"))
+        Pattern classPattern = Pattern.compile("\\s*class\\s+(\\w+)");
+        long count = Files.lines(file)
+                .filter(line -> classPattern.matcher(line).find())
                 .count();
+        return (int) count;
     }
 
     public static int getMethodCount(Path file) throws IOException {
-        return (int) Files.lines(file)
-                .filter(line -> line.matches("\\s*\\w+\\s+\\w+\\s*\\(.*\\)\\s*\\{"))
+        Pattern methodPattern = Pattern.compile("\\s*(void\\s+|\\w+\\s+)\\w+\\s*\\([^)]*\\)\\s*\\{");
+        long count = Files.lines(file)
+                .filter(line -> methodPattern.matcher(line).find())
                 .count();
+        return (int) count;
     }
+
 }
