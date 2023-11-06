@@ -21,6 +21,7 @@ public class Main {
                         String message = "";
                         if (parts[3].startsWith("\"")) {
                             for (int i = 3; i < parts.length; i++) {
+
                                 message += parts[i] + " ";
                             }
                             message = message.substring(1, message.length() - 2);

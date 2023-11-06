@@ -57,13 +57,12 @@ public class CommandRunner extends Thread{
 
     @Override
     public void run() {
-        // Schedule the detection flow every 5 seconds
         while (true) {
             runDetection();
             try {
-                Thread.sleep(5000); // Sleep for 5 seconds
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
-                e.printStackTrace(); // Handle the interruption if needed
+                e.printStackTrace();
             }
         }
     }
@@ -130,7 +129,7 @@ public class CommandRunner extends Thread{
                 if (Files.isRegularFile(fileData)) {
                     if (extension.equalsIgnoreCase("png") || extension.equalsIgnoreCase("jpg")) {
 
-                        System.out.println("Image Size: " + getImageSize(fileData));
+                        System.out.println("Image Size: " + ImgData.getImageSize(fileData));
                     } else if (extension.equalsIgnoreCase("txt")) {
 
                         System.out.println("Line Count: " + FileData.getLineCount(fileData));
@@ -149,26 +148,6 @@ public class CommandRunner extends Thread{
         }
     }
 
-    private static String getImageSize(Path file) throws IOException {
-        String extension = file.toString().substring(file.toString().lastIndexOf('.') + 1).toLowerCase();
-        if (extension.equals("png") || extension.equals("jpg")) {
-            int width = 0;
-            int height = 0;
-
-            try {
-                java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(file.toFile());
-                width = img.getWidth();
-                height = img.getHeight();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return width + "x" + height;
-        }
-
-        return "Not an image file";
-    }
-
 
     public static void status() {
         Logger logger = LoggerSetup.getLogger(CommandRunner.class.getName());
@@ -176,7 +155,7 @@ public class CommandRunner extends Thread{
 
         try {
             if (snapshotTime != null && getMessage() != null) {
-                String snapshotMessage = "Snapshot created at " + snapshotTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " with message:" + getMessage();
+                String snapshotMessage = "Snapshot updated at " + snapshotTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " with message:" + getMessage();
                 System.out.println(snapshotMessage);
                 logger.info(snapshotMessage);
             }
