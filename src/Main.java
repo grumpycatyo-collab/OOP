@@ -82,14 +82,13 @@ public class Main {
         }
     }
 
-    // Implement operations for each type of stack and queue
     private static void handleArrayUpStackOperations() {
         Stack<String> arrayUpStack = new ArrayUpStack<>(5);
         stackOperations(arrayUpStack);
     }
 
     private static void handleDoubleArrayStackOperations() {
-        Stack<Double> doubleArrayStack = new DoubleArrayStack<>(6);
+        Stack<Double> doubleArrayStack = new DoubleArrayStack<>(5);
         stackOperations(doubleArrayStack);
     }
 
@@ -104,7 +103,7 @@ public class Main {
     }
 
     private static void handleCircularQueueOperations() {
-        Queue<Boolean> circularQueue = new CircularQueue<>(3);
+        Queue<Boolean> circularQueue = new CircularQueue<>(5);
         queueOperations(circularQueue);
     }
 
@@ -126,10 +125,18 @@ public class Main {
 
             switch (operation) {
                 case 1:
-                    System.out.println("Enter an element to push:");
-                    T element = (T) scanner.nextLine();
-                    stack.push(element);
-                    break;
+                    if(stack.isFull()){
+                        System.out.println("Stack is full. You cannot push");
+                        break;
+                    }
+                    else {
+                        System.out.println("Enter an element to push:");
+                        T element = (T) scanner.nextLine();
+
+                        stack.push(element);
+                        System.out.println("Element pushed successfully");
+                        break;
+                    }
                 case 2:
                     if (!stack.isEmpty()) {
                         System.out.println("Popped element: " + stack.pop());
@@ -159,10 +166,16 @@ public class Main {
 
             switch (operation) {
                 case 1:
+                    if(queue.isFull()){
+                        System.out.println("Queue is full. You cannot enqueue");
+                        break;
+                    }
+                {
                     System.out.println("Enter an element to enqueue:");
                     T element = (T) scanner.nextLine();
                     queue.enqueue(element);
                     break;
+                }
                 case 2:
                     if (!queue.isEmpty()) {
                         System.out.println("Dequeued element: " + queue.dequeue());
